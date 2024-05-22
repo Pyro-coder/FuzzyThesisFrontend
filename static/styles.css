@@ -16,6 +16,10 @@ main {
     padding: 20px;
 }
 
+.table-container {
+    overflow-x: auto;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -26,17 +30,24 @@ th, td {
     border: 1px solid #dee2e6;
     padding: 8px;
     text-align: left;
+    vertical-align: top;
 }
 
 th {
     background-color: #e9ecef;
 }
 
-select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
+.radio-group {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.radio-group label {
+    flex: 1;
+    min-width: 100px;  /* Ensure minimum width for alignment */
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
 
 .button-container {
@@ -62,7 +73,22 @@ footer {
     background-color: #f1f1f1;
     padding: 10px;
     text-align: center;
-    position: fixed;
+    position: relative;
     width: 100%;
     bottom: 0;
+}
+
+@media (max-width: 600px) {
+    .radio-group {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    label {
+        margin-right: 10px;
+    }
+
+    footer {
+        position: static;
+    }
 }

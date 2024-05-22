@@ -1,7 +1,7 @@
 // desktop/main.js
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
-const { exec } = require('child_process');
+const { execFile } = require('child_process');
 
 function createWindow() {
     const mainWindow = new BrowserWindow({
@@ -21,15 +21,15 @@ function createWindow() {
 }
 
 app.on('ready', () => {
-    // Start the Flask server
-    const flaskProcess = exec('python ../app.py');
-
-    flaskProcess.stdout.on('data', (data) => {
-        console.log(`Flask: ${data}`);
-    });
-
-    flaskProcess.stderr.on('data', (data) => {
-        console.error(`Flask error: ${data}`);
+    // Start the Flask server using the bundled executable
+    const flaskExecutable = path.join(__dirname, '..', 'pclr_exam', 'dist', 'app');
+    const flaskProcess = execFile(flaskExecutable, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error: ${error}`);
+            return;
+        }
+        console.log(`stdout: ${stdout}`);
+        console.error(`stderr: ${stderr}`);
     });
 
     createWindow();
