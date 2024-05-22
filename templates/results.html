@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>Results</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Category</th>
+            <th>Score</th>
+            <th>Importance</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for key, value in results.items() if '_score' in key %}
+        <tr>
+            <td>{{ key.split('_')[0] }}</td>
+            <td>{{ value }}</td>
+            <td>{{ results[key.replace('_score', '_importance')] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

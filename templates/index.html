@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<form method="post" id="pclrForm">
+    <table>
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Score</th>
+                <th>Importance</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in criteria %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>
+                    <select name="{{ item.name }}_score" class="pclr-term">
+                        <option value=""></option>
+                        {% for score in scoring_criteria[item.name] %}
+                        <option value="{{ score }}">{{ score }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>
+                    <select name="{{ item.name }}_importance">
+                        <option value="Low">Low</option>
+                        <option value="Moderate">Moderate</option>
+                        <option value="High">High</option>
+                        <option value="Very High">Very High</option>
+                    </select>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="button-container">
+        <button type="submit" id="submitButton">Submit</button>
+    </div>
+</form>
+
+<script>
+document.getElementById('pclrForm').addEventListener('submit', function(event) {
+    var pclrTerms = document.querySelectorAll('.pclr-term');
+    var valid = true;
+    pclrTerms.forEach(function(select) {
+        if (select.value === "") {
+            valid = false;
+        }
+    });
+    if (!valid) {
+        alert('Please select a value for all PCLR terms.');
+        event.preventDefault();
+    }
+});
+</script>
+{% endblock %}
