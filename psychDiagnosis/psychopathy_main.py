@@ -835,10 +835,10 @@ def calculate_and_save_psychopathy(psych_score, title, output_dir):
     scatter_y = [1, 1, 1]
 
     plt.figure(figsize=(10, 6))
-    plt.plot(X1, Y1, label="csU(x)", lw=3)
-    plt.plot(X2, Y2, label="csL(x)", lw=3)
-    plt.scatter(X3, Y3, label="fou", color='red', marker='+')
-    plt.scatter(scatter_x, scatter_y, label="Centroids", color='blue', marker='D', s=10)
+    plt.plot(X1, Y1, label="csU(x)", lw=3, zorder=1)
+    plt.plot(X2, Y2, label="csL(x)", lw=3, zorder=1)
+    plt.scatter(X3, Y3, label="fou", color='red', marker='+', zorder=2)
+    plt.scatter(scatter_x, scatter_y, label="Centroids", color='blue', marker='D', s=40, zorder=3)
 
     plt.xlabel("X")
     plt.ylabel("Y")
@@ -846,12 +846,13 @@ def calculate_and_save_psychopathy(psych_score, title, output_dir):
     plt.legend()
     plt.grid(True)
 
-    # Save the plot
+    # Save the plot with higher resolution
     output_path = os.path.join(output_dir, f"{title.replace(' ', '_')}.png")
-    plt.savefig(output_path)
+    plt.savefig(output_path, dpi=300)  # Set dpi to 300 for high resolution
     plt.close()
 
     return output_path
+
 
 
 def generate_plots(output_dir):
