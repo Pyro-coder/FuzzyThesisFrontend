@@ -11,13 +11,56 @@
         </tr>
     </thead>
     <tbody>
-        {% for key, value in results.items() if '_score' in key %}
+        {% for item in results %}
         <tr>
-            <td>{{ key.split('_')[0] }}</td>
-            <td>{{ value }}</td>
-            <td>{{ results[key.replace('_score', '_importance')] }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.selected_score }}</td>
+            <td>{{ item.selected_importance }}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+
+<h2>Plots</h2>
+<div class="plot-container">
+    {% for plot in plots %}
+    <div>
+        <img src="{{ plot }}" alt="Psychopathy Plot" style="width: 100%; max-width: 600px;">
+    </div>
+    {% endfor %}
+</div>
+
+<div class="button-container">
+    <a href="{{ url_for('index') }}" class="btn">Start New Diagnosis</a>
+</div>
+
+<style>
+    .plot-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    .plot-container img {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .button-container {
+        margin-top: 20px;
+        text-align: center;
+    }
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        color: #fff;
+        background-color: #007bff;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+    }
+    .btn:hover {
+        background-color: #0056b3;
+    }
+</style>
 {% endblock %}

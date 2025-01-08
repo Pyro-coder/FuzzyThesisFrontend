@@ -8,7 +8,12 @@
                 <tr>
                     <th>Category</th>
                     <th>Score</th>
-                    <th>Importance</th>
+                    <th>
+                        Importance
+                        <label>
+                            <input type="checkbox" id="importanceToggle"> Enable Editing
+                        </label>
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -25,11 +30,12 @@
                         </div>
                     </td>
                     <td>
-                        <select name="{{ item.name }}_importance">
-                            <option value="Low">Low</option>
-                            <option value="Moderate">Moderate</option>
-                            <option value="High">High</option>
-                            <option value="Very High">Very High</option>
+                        <select name="{{ item.name }}_importance" class="importance-dropdown" data-enabled="false">
+                            <option value="Low" {% if item.default_importance == "Low" %}selected{% endif %}>Low</option>
+                            <option value="Moderate" {% if item.default_importance == "Moderate" %}selected{% endif %}>Moderate</option>
+                            <option value="High" {% if item.default_importance == "High" %}selected{% endif %}>High</option>
+                            <option value="Very High" {% if item.default_importance == "Very High" %}selected{% endif %}>Very High</option>
+                            <option value="Maximum" {% if item.default_importance == "Maximum" %}selected{% endif %}>Maximum</option>
                         </select>
                     </td>
                 </tr>
@@ -43,22 +49,70 @@
 </form>
 
 <script>
-document.getElementById('pclrForm').addEventListener('submit', function(event) {
-    var valid = true;
-    var radioGroups = document.querySelectorAll('.radio-group');
+    // Ensure dropdowns are correctly styled as disabled on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        const importanceDropdowns = document.querySelectorAll('.importance-dropdown');
+        importanceDropdowns.forEach(function (dropdown) {
+            if (dropdown.getAttribute('data-enabled') === 'false') {
+                dropdown.classList.add('disabled-dropdown');
+            }
+        });
+    });
 
-    radioGroups.forEach(function(group) {
-        var radios = group.querySelectorAll('input[type="radio"]');
-        var isChecked = Array.from(radios).some(radio => radio.checked);
-        if (!isChecked) {
-            valid = false;
+    // Enable or disable the "Importance" dropdowns based on the checkbox state
+    document.getElementById('importanceToggle').addEventListener('change', function (event) {
+        const isEnabled = event.target.checked;
+        const importanceDropdowns = document.querySelectorAll('.importance-dropdown');
+
+        importanceDropdowns.forEach(function (dropdown) {
+            if (isEnabled) {
+                dropdown.removeAttribute('data-enabled');
+                dropdown.classList.remove('disabled-dropdown');
+            } else {
+                dropdown.setAttribute('data-enabled', 'false');
+                dropdown.classList.add('disabled-dropdown');
+            }
+        });
+    });
+
+    // Prevent interaction with visually disabled dropdowns
+    document.addEventListener('mousedown', function (event) {
+        if (event.target.matches('.importance-dropdown[data-enabled="false"]')) {
+            event.preventDefault();
         }
     });
 
-    if (!valid) {
-        alert('Please select a value for all PCLR terms.');
-        event.preventDefault();
-    }
-});
+    // Validate the form before submission
+    document.getElementById('pclrForm').addEventListener('submit', function (event) {
+        var valid = true;
+        var radioGroups = document.querySelectorAll('.radio-group');
+
+        radioGroups.forEach(function (group) {
+            var radios = group.querySelectorAll('input[type="radio"]');
+            var isChecked = Array.from(radios).some(radio => radio.checked);
+            if (!isChecked) {
+                valid = false;
+            }
+        });
+
+        if (!valid) {
+            alert('Please select a value for all PCLR terms.');
+            event.preventDefault();
+        }
+    });
 </script>
+
+<style>
+    /* Custom style to indicate visually disabled dropdowns */
+    .disabled-dropdown {
+        pointer-events: none;
+        background-color: #e9ecef;
+        color: #6c757d;
+    }
+
+    /* Optional styling for the checkbox label */
+    #importanceToggle {
+        margin-left: 10px;
+    }
+</style>
 {% endblock %}
