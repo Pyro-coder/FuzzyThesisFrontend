@@ -7,13 +7,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0e10492a-d3a7-497f-b259-506905fd1371" name="Changes" comment="Added functionality to frontend">
+    <list default="true" id="0e10492a-d3a7-497f-b259-506905fd1371" name="Changes" comment="Fixed the graph and tree problems">
       <changelist_data name="Noah Oppermann" email="" automatic="false" />
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Flask/static/plots/Criminal_Psychopathy.png" beforeDir="false" afterPath="$PROJECT_DIR$/Flask/static/plots/Criminal_Psychopathy.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Flask/static/plots/Non-Criminal_Psychopathy.png" beforeDir="false" afterPath="$PROJECT_DIR$/Flask/static/plots/Non-Criminal_Psychopathy.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Flask/static/plots/Professionally_Beneficial_Psychopathy.png" beforeDir="false" afterPath="$PROJECT_DIR$/Flask/static/plots/Professionally_Beneficial_Psychopathy.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Flask/templates/results.html" beforeDir="false" afterPath="$PROJECT_DIR$/Flask/templates/results.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Flask/static/plots/Criminal_Psychopathy.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Flask/static/plots/Non-Criminal_Psychopathy.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Flask/static/plots/Professionally_Beneficial_Psychopathy.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/psychDiagnosis/conj_disj.py" beforeDir="false" afterPath="$PROJECT_DIR$/psychDiagnosis/conj_disj.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/psychDiagnosis/excel/PCLRWords.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/psychDiagnosis/excel/PCLRWords.xlsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/psychDiagnosis/psychopathy_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/psychDiagnosis/psychopathy_main.py" afterDir="false" />
     </list>
@@ -72,27 +73,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;Flask server.Flask (Flask/app.py).executor&quot;: &quot;Run&quot;,
-    &quot;Flask server.ThesisFlask.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/FuzzyThesisFrontend/psychDiagnosis&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;npm.make.executor&quot;: &quot;Run&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "Flask server.Flask (Flask/app.py).executor": "Run",
+    "Flask server.ThesisFlask.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "master",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "D:/FuzzyThesisFrontend/psychDiagnosis",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "npm.make.executor": "Run",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\FuzzyThesisFrontend\psychDiagnosis" />
@@ -176,7 +177,12 @@
       <workItem from="1736205250255" duration="1003000" />
       <workItem from="1736262543247" duration="3709000" />
       <workItem from="1736298652111" duration="6142000" />
-      <workItem from="1736305239380" duration="377000" />
+      <workItem from="1736305239380" duration="4236000" />
+      <workItem from="1736541321896" duration="10376000" />
+      <workItem from="1736608460119" duration="7918000" />
+      <workItem from="1736712848108" duration="728000" />
+      <workItem from="1736713594461" duration="60000" />
+      <workItem from="1736713829572" duration="19440000" />
     </task>
     <servers />
   </component>
@@ -196,10 +202,23 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Added functionality to frontend" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added functionality to frontend" />
+    <MESSAGE value="Fixed layouts and plot resolutions" />
+    <MESSAGE value="Fixed the graph and tree problems" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed the graph and tree problems" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/psychDiagnosis/psychopathy_main.py</url>
+          <line>761</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/FuzzyThesisFrontend$Flask__Flask_app_py_.coverage" NAME="Flask (Flask/app.py) Coverage Results" MODIFIED="1736305511982" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/FuzzyThesisFrontend$Flask__Flask_app_py_.coverage" NAME="Flask (Flask/app.py) Coverage Results" MODIFIED="1736818384566" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/ThesisFlask$ThesisFlask.coverage" NAME="ThesisFlask Coverage Results" MODIFIED="1716416634499" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/FuzzyThesisFrontend$ThesisFlask.coverage" NAME="ThesisFlask Coverage Results" MODIFIED="1736303847657" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>

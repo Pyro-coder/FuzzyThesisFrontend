@@ -165,7 +165,7 @@ def penalty(params):
     return 0.0
 
 
-# Define the wcd function for DC variant
+# Define the wdc function for DC variant
 def wdc(r1, r2, P, R):
     # Set the initial guess
     initial_guess = [0.5, 0.5]

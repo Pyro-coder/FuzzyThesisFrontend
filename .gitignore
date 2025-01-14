@@ -1,0 +1,70 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+env/
+venv/
+ENV/
+*.env
+*.venv
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.whl
+*.log
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+*.cover
+*.py,cover
+.cache
+nosetests.xml
+coverage.xml
+
+# Flask-specific
+instance/
+*.db
+*.sqlite3
+.env
+.flaskenv
+
+# Electron-specific
+node_modules/
+dist/
+build/
+out/
+*.asar
+*.asar.unpacked
+
+# Packaging files
+forge.config.js
+
+# Operating system specific
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Linux
+*~
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# IDE-specific
+.idea/
+.vscode/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/

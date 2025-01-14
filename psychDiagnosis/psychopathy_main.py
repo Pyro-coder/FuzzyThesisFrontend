@@ -1,4 +1,5 @@
 import os
+
 from . import fou_points
 from . import trapezoid
 from . import trapezoid as tpz
@@ -478,21 +479,55 @@ def compute_alpha(x, y, r1, r2, P, R, w_func, delta_plus_func, delta_minus_func)
     return out
 
 
-def alpha_cpa(x, y, r1, r2, P, R):
+def alpha_cpa(x, y, r1=1.449, r2=-10, P=-25, R=15):
     return compute_alpha(x, y, r1, r2, P, R, cd.wdc, cd.dc_delta_plus, cd.dc_delta_minus)
 
 
-def alpha_dpa(x, y, r1, r2, P, R):
+def alpha_dpa(x, y, r1=-10, r2=1.449, P=-25, R=15):
     return compute_alpha(x, y, r1, r2, P, R, cd.wcd, cd.cd_delta_plus, cd.cd_delta_minus)
 
 
-# CPA Parameters
-r1 = 1.449
-r2 = -10
-P = -25
-R = 15
+def alpha_calc(A, W, r):
+    """
+    Calculate alpha-cut arrays of Weighted Product Model (WPM) for attribute A data array
+    with weights Wts array.
+    r is the WPM exponent.
 
-def interpersonal_desirable(r1, r2, P, R, exponent):
+    Parameters:
+        A (np.ndarray): Attribute data array with lower and upper bounds.
+        W (np.ndarray): Weights array with lower and upper bounds.
+        r (float): WPM exponent.
+
+    Returns:
+        np.ndarray: The resulting alpha-cut array.
+    """
+    # Check if A has more than one row
+    if A.shape[0] > 1:
+        # Extract xU and xL arrays
+        xU = np.zeros(A.shape[0])
+        xL = np.zeros(A.shape[0])
+        for i in range(A.shape[0]):
+            xU[i] = A[i, 0]
+            xL[i] = A[i, 1]
+
+        # Extract wU and wL arrays
+        wU = np.zeros(W.shape[0])
+        wL = np.zeros(W.shape[0])
+        for i in range(W.shape[0]):
+            wU[i] = W[i, 0]
+            wL[i] = W[i, 1]
+
+    # Calculate alpha_out
+    alpha_out = A[0, 1]  # Default value if no calculations needed
+
+    if A.shape[0] > 1:
+        alpha_out = acpm.alpha_to_alpha_t2wpm(xU, xL, wU, wL, r)
+
+    return alpha_out
+
+
+
+def interpersonal_desirable(exponent):
     xDU = [ interpersonal_data.values[0][0][0], interpersonal_data.values[1][0][0] ]
     xDL = [ interpersonal_data.values[0][0][1], interpersonal_data.values[1][0][1] ]
 
@@ -501,14 +536,14 @@ def interpersonal_desirable(r1, r2, P, R, exponent):
 
     iD = acpm.alpha_to_alpha_t2wpm(xDU, xDL, wDU, wDL, exponent)
 
-    return alpha_dpa(interpersonal_data.values[2][0].tolist(), iD, r1, r2, P, R)
+    return alpha_dpa(interpersonal_data.values[2][0].tolist(), iD)
 
-def interpersonal_calc(r1, r2, P, R):
-    desirable = interpersonal_desirable(r1, r2, P, R, 2)
-    return alpha_cpa(interpersonal_data.values[3][0].tolist(), desirable, r1, r2, P, R)
+def interpersonal_calc():
+    desirable = interpersonal_desirable(2)
+    return alpha_cpa(interpersonal_data.values[3][0].tolist(), desirable)
 
 
-def affective_calc(r1, r2, P, R, mandatory_exponent, desired_exponent):
+def affective_calc(mandatory_exponent, desired_exponent):
     xMU = [ affective_data.values[0][0][0], affective_data.values[1][0][0] ]
     xML = [ affective_data.values[0][0][1], affective_data.values[1][0][1] ]
 
@@ -525,10 +560,10 @@ def affective_calc(r1, r2, P, R, mandatory_exponent, desired_exponent):
 
     alpha_desired = acpm.alpha_to_alpha_t2wpm(xDU, xDL, wDU, wDL, desired_exponent)
 
-    return alpha_cpa(alpha_mandatory, alpha_desired, r1, r2, P, R)
+    return alpha_cpa(alpha_mandatory, alpha_desired)
 
 
-def lifestyle_calc(r1, r2, P, R, exponent):
+def lifestyle_calc(exponent):
     xDU = [ lifestyle_data.values[0][0][0], lifestyle_data.values[1][0][0], lifestyle_data.values[5][0][0] ]
     xDL = [ lifestyle_data.values[0][0][1], lifestyle_data.values[1][0][1], lifestyle_data.values[5][0][1] ]
 
@@ -549,9 +584,9 @@ def lifestyle_calc(r1, r2, P, R, exponent):
 
     lifestyle_sufficient = acpm.alpha_to_alpha_t2wpm(xSU, xSL, wSU, wSL, exponent)
 
-    return alpha_dpa(lifestyle_sufficient, lifestyle_desirable, r1, r2, P, R)
+    return alpha_dpa(lifestyle_sufficient, lifestyle_desirable)
 
-def antisocial_calc(r1, r2, P, R, exponent):
+def antisocial_calc(exponent):
     xDU = [ antisocial_data.values[0][0][0], antisocial_data.values[3][0][0] ]
     xDL = [ antisocial_data.values[0][0][1], antisocial_data.values[3][0][1] ]
 
@@ -568,14 +603,14 @@ def antisocial_calc(r1, r2, P, R, exponent):
 
     antisocial_sufficient = acpm.alpha_to_alpha_t2wpm(xSU, xSL, wSU, wSL, exponent)
 
-    return alpha_dpa(antisocial_sufficient, antisocial_desirable, r1, r2, P, R)
+    return alpha_dpa(antisocial_sufficient, antisocial_desirable)
 
 
-def criminal_psychopathy(r1, r2, P, R, exponent):
-    interpersonal = interpersonal_calc(r1, r2, P, R)
-    affective = affective_calc(r1, r2, P, R, mandatory_exponent=-10, desired_exponent=1)
-    lifestyle = lifestyle_calc(r1, r2, P, R, 2)
-    antisocial = antisocial_calc(r1, r2, P, R, 2)
+def criminal_psychopathy(exponent):
+    interpersonal = interpersonal_calc()
+    affective = affective_calc(mandatory_exponent=-10, desired_exponent=1)
+    lifestyle = lifestyle_calc(2)
+    antisocial = antisocial_calc(2)
 
     interpersonal_weight = alpha_5[4]
     affective_weight = alpha_5[4]
@@ -593,7 +628,7 @@ def criminal_psychopathy(r1, r2, P, R, exponent):
 
 
 
-def pb_lifestyle(r1, r2, P, R, exponent):
+def pb_lifestyle(exponent):
     xDU = [ lifestyle_data.values[2][0][0], lifestyle_data.values[3][0][0], lifestyle_data.values[4][0][0],
             lifestyle_data.values[5][0][0], lifestyle_data.values[6][0][0] ]
     xDL = [ lifestyle_data.values[2][0][1], lifestyle_data.values[3][0][1], lifestyle_data.values[4][0][1],
@@ -612,10 +647,11 @@ def pb_lifestyle(r1, r2, P, R, exponent):
 
     lifestyle_sufficient = acpm.alpha_to_alpha_t2wpm(xSU, xSL, wSU, wSL, exponent)
 
-    return alpha_dpa(lifestyle_sufficient, lifestyle_desirable, r1, r2, P, R)
+    return alpha_dpa(lifestyle_sufficient, lifestyle_desirable)
 
 
-def pb_interpersonal(r1, r2, P, R, exponent):
+def pb_interpersonal(exponent):
+    interpersonal_desired = interpersonal_data.values[3][0]
     xSU = [ interpersonal_data.values[0][0][0], interpersonal_data.values[1][0][0] ]
     xSL = [ interpersonal_data.values[0][0][1], interpersonal_data.values[1][0][1] ]
 
@@ -624,12 +660,12 @@ def pb_interpersonal(r1, r2, P, R, exponent):
 
     interpersonal_sufficient = acpm.alpha_to_alpha_t2wpm(xSU, xSL, wSU, wSL, exponent)
 
-    interpersonal_d = alpha_dpa(interpersonal_sufficient, interpersonal_data.values[3][0].tolist(), r1, r2, P, R)
+    interpersonal_d = alpha_dpa(interpersonal_sufficient, interpersonal_desired)
 
-    return alpha_cpa(interpersonal_data.values[2][0], interpersonal_d, r1, r2, P, R)
+    return alpha_cpa(interpersonal_data.values[2][0], interpersonal_d)
 
 
-def pb_affective(r1, r2, P, R, exponent):
+def pb_affective(exponent):
     xMU = [ affective_data.values[0][0][0], affective_data.values[1][0][0] ]
     xML = [ affective_data.values[0][0][1], affective_data.values[1][0][1] ]
 
@@ -638,20 +674,20 @@ def pb_affective(r1, r2, P, R, exponent):
 
     affective_mandatory = acpm.alpha_to_alpha_t2wpm(xMU, xML, wMU, wML, -10)
 
-    xDU = [affective_data.values[2][0][0], affective_data.values[2][0][0]]
-    xDL = [affective_data.values[3][0][1], affective_data.values[3][0][1]]
+    xDU = [affective_data.values[2][0][0], affective_data.values[3][0][0]]
+    xDL = [affective_data.values[2][0][1], affective_data.values[3][0][1]]
 
     wDU = [alpha_5[2][0], alpha_5[3][0]]
     wDL = [alpha_5[2][1], alpha_5[3][1]]
 
     affective_desired = acpm.alpha_to_alpha_t2wpm(xDU, xDL, wDU, wDL, exponent)
 
-    return alpha_cpa(affective_mandatory, affective_desired, r1, r2, P, R)
+    return alpha_cpa(affective_mandatory, affective_desired)
 
-def professionally_beneficial_psychopathy(r1, r2, P, R, exponent):
-    lifestyle = pb_lifestyle(r1, r2, P, R, 2)
-    interpersonal = pb_interpersonal(r1, r2, P, R, 1)
-    affective = pb_affective(r1, r2, P, R, 2)
+def professionally_beneficial_psychopathy(exponent):
+    lifestyle = pb_lifestyle(2)
+    interpersonal = pb_interpersonal(1)
+    affective = pb_affective(2)
 
     lifestyle_weight = alpha_5[2]
     interpersonal_weight = alpha_5[4]
@@ -663,11 +699,13 @@ def professionally_beneficial_psychopathy(r1, r2, P, R, exponent):
     wDU = [ lifestyle_weight[0], interpersonal_weight[0], affective_weight[0] ]
     wDL = [ lifestyle_weight[1], interpersonal_weight[1], affective_weight[1] ]
 
-    return acpm.alpha_to_alpha_t2wpm(xDU, xDL, wDU, wDL, exponent)
+    out = acpm.alpha_to_alpha_t2wpm(xDU, xDL, wDU, wDL, exponent)
+    print(out)
+    return out
 
 
 
-def nc_interpersonal(r1, r2, P, R, exponent):
+def nc_interpersonal(exponent):
     xDU = [ interpersonal_data.values[3][0][0], interpersonal_data.values[2][0][0] ]
     xDL = [ interpersonal_data.values[3][0][1], interpersonal_data.values[2][0][1] ]
 
@@ -684,9 +722,9 @@ def nc_interpersonal(r1, r2, P, R, exponent):
 
     interpersonal_sufficient = acpm.alpha_to_alpha_t2wpm(xSU, xSL, wSU, wSL, exponent)
 
-    return alpha_dpa(interpersonal_sufficient, interpersonal_d, r1, r2, P, R)
+    return alpha_dpa(interpersonal_sufficient, interpersonal_d)
 
-def nc_affective(r1, r2, P, R):
+def nc_affective():
     xDU = [ affective_data.values[0][0][0], affective_data.values[1][0][0] ]
     xDL = [ affective_data.values[0][0][1], affective_data.values[1][0][1] ]
 
@@ -695,18 +733,18 @@ def nc_affective(r1, r2, P, R):
 
     affective_d = acpm.alpha_to_alpha_t2wpm(xDU, xDL, wDU, wDL, 2)
 
-    affective_desirable = alpha_dpa(affective_data.values[2][0], affective_d, r1, r2, P, R)
+    affective_desirable = alpha_dpa(affective_data.values[2][0], affective_d)
 
-    return alpha_cpa(affective_data.values[3][0], affective_desirable, r1, r2, P, R)
+    return alpha_cpa(affective_data.values[3][0], affective_desirable)
 
-def nc_lifestyle(r1, r2, P, R, exponent):
+def nc_lifestyle():
     xDU = [ lifestyle_data.values[2][0][0], lifestyle_data.values[3][0][0], lifestyle_data.values[4][0][0] ]
     xDL = [ lifestyle_data.values[2][0][1], lifestyle_data.values[3][0][1], lifestyle_data.values[4][0][1] ]
 
     wDU = [ alpha_5[3][0], alpha_5[4][0], alpha_5[3][0] ]
     wDL = [ alpha_5[3][1], alpha_5[4][1], alpha_5[3][1] ]
 
-    lifestyle_desirable = acpm.alpha_to_alpha_t2wpm(xDU, xDL, wDU, wDL, exponent)
+    lifestyle_desirable = acpm.alpha_to_alpha_t2wpm(xDU, xDL, wDU, wDL, 1)
 
     xSU = [lifestyle_data.values[0][0][0], lifestyle_data.values[1][0][0], lifestyle_data.values[5][0][0], lifestyle_data.values[6][0][0] ]
     xSL = [lifestyle_data.values[0][0][1], lifestyle_data.values[1][0][1], lifestyle_data.values[5][0][1], lifestyle_data.values[6][0][1] ]
@@ -714,14 +752,14 @@ def nc_lifestyle(r1, r2, P, R, exponent):
     wSU = [alpha_5[4][0], alpha_5[4][0], alpha_5[2][0], alpha_5[4][0] ]
     wSL = [alpha_5[4][1], alpha_5[4][1], alpha_5[2][1], alpha_5[4][1] ]
 
-    lifestyle_sufficient = acpm.alpha_to_alpha_t2wpm(xSU, xSL, wSU, wSL, exponent)
+    lifestyle_sufficient = acpm.alpha_to_alpha_t2wpm(xSU, xSL, wSU, wSL, 1)
 
-    return alpha_dpa(lifestyle_sufficient, lifestyle_desirable, r1, r2, P, R)
+    return alpha_dpa(lifestyle_sufficient, lifestyle_desirable)
 
-def noncriminal_psychopathy(r1, r2, P, R, exponent):
-    interpersonal = nc_interpersonal(r1, r2, P, R, 1)
-    affective = nc_affective(r1, r2, P, R)
-    lifestyle = nc_lifestyle(r1, r2, P, R, 2)
+def noncriminal_psychopathy(exponent):
+    interpersonal = nc_interpersonal(1)
+    affective = nc_affective()
+    lifestyle = nc_lifestyle()
 
     interpersonal_weight = alpha_5[3]
     affective_weight = alpha_5[2]
@@ -835,7 +873,7 @@ def calculate_and_save_psychopathy(psych_score, title, output_dir):
     scatter_y = [1, 1, 1]
 
     plt.figure(figsize=(10, 6))
-    plt.plot(X1, Y1, label="csU(x)", lw=3, zorder=1)
+    plt.plot(X1, Y1, label="csU(x)", lw=3, zorder=2)
     plt.plot(X2, Y2, label="csL(x)", lw=3, zorder=1)
     plt.scatter(X3, Y3, label="fou", color='red', marker='+', zorder=2)
     plt.scatter(scatter_x, scatter_y, label="Centroids", color='blue', marker='D', s=40, zorder=3)
@@ -873,13 +911,13 @@ def generate_plots(output_dir):
     antisocial_weight_data = data["antisocial_weight_data"]
 
     # Generate plots
-    psych_score_criminal = criminal_psychopathy(r1, r2, P, R, 1)
+    psych_score_criminal = criminal_psychopathy(1)
     plot1 = calculate_and_save_psychopathy(psych_score_criminal, "Criminal Psychopathy", output_dir)
 
-    psych_score_professional = professionally_beneficial_psychopathy(r1, r2, P, R, 1)
+    psych_score_professional = professionally_beneficial_psychopathy(1)
     plot2 = calculate_and_save_psychopathy(psych_score_professional, "Professionally Beneficial Psychopathy", output_dir)
 
-    psych_score_noncriminal = noncriminal_psychopathy(r1, r2, P, R, 2)
+    psych_score_noncriminal = noncriminal_psychopathy(2)
     plot3 = calculate_and_save_psychopathy(psych_score_noncriminal, "Non-Criminal Psychopathy", output_dir)
 
     return [plot1, plot2, plot3]
