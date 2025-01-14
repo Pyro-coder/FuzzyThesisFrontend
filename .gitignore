@@ -68,3 +68,7 @@ pnpm-debug.log*
 
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints/
+
+# compiled python
+*.pyc
+*.pyo
