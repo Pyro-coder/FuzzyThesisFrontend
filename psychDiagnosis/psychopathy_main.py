@@ -50,11 +50,11 @@ def fair_upper(x):
 
 
 def somewhat_good_lower(x):
-    return tpz.trap(x, 1, 4.835, 6.5, 6.75, 8.623)
+    return tpz.trap(x, 1, 4.835, 6.5, 6.75, 8.62)
 
 
 def somewhat_good_upper(x):
-    return tpz.trap(x, 1, 4.595, 6.5, 6.75, 7.5)
+    return tpz.trap(x, 1, 4.595, 6.5, 6.75, 10)
 
 
 def good_lower(x):
