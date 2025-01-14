@@ -76,3 +76,6 @@ pnpm-debug.log*
 
 # Plots
 Flask/static/plots/
+
+# Pyinstaller files
+*.spec
