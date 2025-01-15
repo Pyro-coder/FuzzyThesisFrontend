@@ -37,8 +37,6 @@ instance/
 
 # Electron-specific
 node_modules/
-dist/
-build/
 out/
 *.asar
 *.asar.unpacked
@@ -79,3 +77,6 @@ frontend/static/plots/
 
 # Pyinstaller files
 *.spec
+
+# Plots
+Flask/static/plots
