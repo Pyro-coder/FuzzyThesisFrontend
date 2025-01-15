@@ -91,6 +91,7 @@ def index():
     return render_template('index.html', criteria=criteria, scoring_criteria=scoring_criteria)
 
 def start_flask():
+    print("Starting Flask app with Waitress in production mode...")
     serve(app, host='127.0.0.1', port=5000)
 
 if __name__ == '__main__':
