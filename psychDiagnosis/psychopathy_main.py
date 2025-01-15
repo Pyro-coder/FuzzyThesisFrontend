@@ -699,10 +699,7 @@ def professionally_beneficial_psychopathy(exponent):
     wDU = [ lifestyle_weight[0], interpersonal_weight[0], affective_weight[0] ]
     wDL = [ lifestyle_weight[1], interpersonal_weight[1], affective_weight[1] ]
 
-    out = acpm.alpha_to_alpha_t2wpm(xDU, xDL, wDU, wDL, exponent)
-    print(out)
-    return out
-
+    return acpm.alpha_to_alpha_t2wpm(xDU, xDL, wDU, wDL, exponent)
 
 
 def nc_interpersonal(exponent):
@@ -774,8 +771,7 @@ def noncriminal_psychopathy(exponent):
     return acpm.alpha_to_alpha_t2wpm(xDU, xDL, wDU, wDL, exponent)
 
 
-def load_score_data():
-    file_path = "psychDiagnosis/excel/PCLRWords.xlsx"
+def load_score_data(file_path):
     score_sheet = pd.read_excel(file_path, sheet_name="Scores", usecols="A:C", nrows=21)
     scores = score_sheet['Scoring']
     vocab = score_sheet['Factors'].str.strip().str.lower()
@@ -789,8 +785,8 @@ def load_score_data():
     return out
 
 
-def load_weight_data():
-    file_path = "psychDiagnosis/excel/PCLRWords.xlsx"
+
+def load_weight_data(file_path):
     score_sheet = pd.read_excel(file_path, sheet_name="Scores", usecols="A:C", nrows=21)
     vocab = score_sheet['Factors'].str.strip().str.lower()
     trait_weights = score_sheet['Weights']
@@ -805,9 +801,9 @@ def load_weight_data():
     return out
 
 
-def get_filtered_data():
-    score_data = load_score_data()
-    weight_data = load_weight_data()
+def get_filtered_data(file_path):
+    score_data = load_score_data(file_path)
+    weight_data = load_weight_data(file_path)
 
     # Normalize factor names for filtering
     score_data.index = score_data.index.str.strip().str.lower()
@@ -841,6 +837,7 @@ def get_filtered_data():
         "antisocial_weight_data": weight_data.loc[antisocial_factors]
     }
     return data
+
 
 
 # Generate and Save Psychopathy Plots
@@ -893,10 +890,11 @@ def calculate_and_save_psychopathy(psych_score, title, output_dir):
 
 
 
-def generate_plots(output_dir):
-    # Reload filtered data
-    data = get_filtered_data()
+def generate_plots(output_dir, file_path):
+    # Reload filtered data with the file path
+    data = get_filtered_data(file_path)
 
+    # Set global variables for data
     global interpersonal_data, affective_data, lifestyle_data, antisocial_data
     global interpersonal_weight_data, affective_weight_data, lifestyle_weight_data, antisocial_weight_data
 

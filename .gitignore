@@ -28,7 +28,7 @@ htmlcov/
 nosetests.xml
 coverage.xml
 
-# Flask-specific
+# frontend-specific
 instance/
 *.db
 *.sqlite3
@@ -75,7 +75,7 @@ pnpm-debug.log*
 
 
 # Plots
-Flask/static/plots/
+frontend/static/plots/
 
 # Pyinstaller files
 *.spec

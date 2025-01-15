@@ -1,24 +1,14 @@
 import os
-import time
+import webview
+import threading
 import pandas as pd
 import openpyxl
 import shutil
+from waitress import serve
 from flask import Flask, render_template, request
 from psychDiagnosis.psychopathy_main import generate_plots
 
-app = Flask(__name__)
-
-# Paths for the Excel file
-BUNDLED_EXCEL_FILE = os.path.join(os.path.dirname(__file__), 'psychDiagnosis/excel/PCLRWords.xlsx')
-EXTERNAL_EXCEL_DIR = os.path.join(os.getcwd(), 'psychDiagnosis', 'excel')
-EXTERNAL_EXCEL_FILE = os.path.join(EXTERNAL_EXCEL_DIR, 'PCLRWords.xlsx')
-
-# Ensure the Excel file is extracted and available for runtime editing
-def ensure_excel_file():
-    if not os.path.exists(EXTERNAL_EXCEL_DIR):
-        os.makedirs(EXTERNAL_EXCEL_DIR, exist_ok=True)
-    if not os.path.exists(EXTERNAL_EXCEL_FILE):
-        shutil.copy(BUNDLED_EXCEL_FILE, EXTERNAL_EXCEL_FILE)
+app = Flask(__name__, template_folder='frontend/templates', static_folder='frontend/static')
 
 # Function to load data from the Excel file
 def load_data_from_excel(file_path):
@@ -41,6 +31,7 @@ def load_data_from_excel(file_path):
 
     return criteria, scoring_criteria
 
+
 # Save updated data to Excel
 def save_updates_to_excel(file_path, updated_criteria):
     workbook = openpyxl.load_workbook(file_path)
@@ -55,17 +46,17 @@ def save_updates_to_excel(file_path, updated_criteria):
 
     workbook.save(file_path)
 
+
 # Ensure a static folder for storing plots
-PLOTS_DIR = os.path.join(app.root_path, 'static', 'plots')
+PLOTS_DIR = os.path.join(app.root_path, 'frontend', 'static', 'plots')
 os.makedirs(PLOTS_DIR, exist_ok=True)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    # Ensure the Excel file is ready for use
-    ensure_excel_file()
-
-    # Reload fresh data from the external Excel file
-    criteria, scoring_criteria = load_data_from_excel(EXTERNAL_EXCEL_FILE)
+    # Reload fresh data from the Excel file
+    EXCEL_FILE = os.path.join(os.path.dirname(__file__), 'psychDiagnosis', 'excel', 'PCLRWords.xlsx')
+    EXCEL_FILE = os.path.abspath(EXCEL_FILE)
+    criteria, scoring_criteria = load_data_from_excel(EXCEL_FILE)
 
     if request.method == 'POST':
         results = request.form.to_dict()
@@ -84,7 +75,7 @@ def index():
             updated_criteria.append(updated_item)
 
         # Save updates to Excel
-        save_updates_to_excel(EXTERNAL_EXCEL_FILE, updated_criteria)
+        save_updates_to_excel(EXCEL_FILE, updated_criteria)
 
         # Clear plots directory to avoid residual data
         if os.path.exists(PLOTS_DIR):
@@ -92,12 +83,20 @@ def index():
         os.makedirs(PLOTS_DIR, exist_ok=True)
 
         # Generate plots
-        plot_paths = generate_plots(PLOTS_DIR)
-        plot_urls = [os.path.relpath(path, app.root_path) for path in plot_paths]
+        plot_paths = generate_plots(PLOTS_DIR, EXCEL_FILE)
+        plot_urls = [os.path.join('static', 'plots', os.path.basename(path)) for path in plot_paths]
 
         return render_template('results.html', results=updated_criteria, plots=plot_urls)
 
     return render_template('index.html', criteria=criteria, scoring_criteria=scoring_criteria)
 
+def start_flask():
+    serve(app, host='127.0.0.1', port=5000)
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    flask_thread = threading.Thread(target=start_flask)
+    flask_thread.daemon = True
+    flask_thread.start()
+
+    webview.create_window("Psychopathy Diagnosis", "http://127.0.0.1:5000", width=1500, height=800)
+    webview.start()
