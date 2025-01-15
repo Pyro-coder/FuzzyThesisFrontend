@@ -182,7 +182,7 @@ def alpha_antonym(a):
 alpha_7 = np.array([alpha_very_bad, alpha_bad, alpha_somewhat_bad, alpha_fair, alpha_somewhat_good, alpha_good,
                     alpha_very_good])
 
-file_path = "psychDiagnosis/excel/PCLRWords.xlsx"
+file_path = os.path.join(os.path.dirname(__file__), "excel/PCLRWords.xlsx")
 words = pd.read_excel(file_path, sheet_name="Words", usecols="A:H", skiprows=2, nrows=20, header=None)
 
 weight_words = pd.read_excel(file_path, sheet_name="Words", usecols="B:F", skiprows=26, nrows=1, header=None)
