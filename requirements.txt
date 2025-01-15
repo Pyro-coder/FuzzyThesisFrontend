@@ -5,3 +5,4 @@ mystic==0.4.3
 numpy==2.2.1
 pandas==2.2.3
 scipy==1.15.1
+pyinstaller==6.11.1
