@@ -7,6 +7,7 @@ import shutil
 from waitress import serve
 from flask import Flask, render_template, request
 from psychDiagnosis.psychopathy_main import generate_plots
+from werkzeug.serving import make_server
 
 app = Flask(__name__, template_folder='frontend/templates', static_folder='frontend/static')
 
@@ -16,14 +17,12 @@ def load_data_from_excel(file_path):
     scores_data = spreadsheet.parse('Scores')
     words_data = spreadsheet.parse('Words')
 
-    # Construct 'criteria'
     criteria = scores_data.rename(columns={
         'Factors': 'name',
         'Weights': 'default_importance',
         'Scoring': 'description'
     }).to_dict(orient='records')
 
-    # Construct 'scoring_criteria'
     scoring_criteria = {}
     for row in words_data.itertuples(index=False, name=None):
         if pd.notnull(row[0]):  # Ensure factor name is not NaN
@@ -47,42 +46,34 @@ def save_updates_to_excel(file_path, updated_criteria):
     workbook.save(file_path)
 
 
-# Ensure a static folder for storing plots
 PLOTS_DIR = os.path.join(app.root_path, 'frontend', 'static', 'plots')
 os.makedirs(PLOTS_DIR, exist_ok=True)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    # Reload fresh data from the Excel file
     EXCEL_FILE = os.path.join(os.path.dirname(__file__), 'psychDiagnosis', 'excel', 'PCLRWords.xlsx')
     EXCEL_FILE = os.path.abspath(EXCEL_FILE)
     criteria, scoring_criteria = load_data_from_excel(EXCEL_FILE)
 
     if request.method == 'POST':
         results = request.form.to_dict()
-
-        # Extract updated scores and weights
         updated_scores = {key: value for key, value in results.items() if key.endswith('_score')}
         updated_importance = {key: value for key, value in results.items() if key.endswith('_importance')}
 
-        # Update criteria
         updated_criteria = []
         for item in criteria:
             name = item['name']
-            updated_item = item.copy()  # Create a fresh copy
+            updated_item = item.copy()
             updated_item['selected_score'] = updated_scores.get(f"{name}_score", "N/A")
             updated_item['selected_importance'] = updated_importance.get(f"{name}_importance", "N/A")
             updated_criteria.append(updated_item)
 
-        # Save updates to Excel
         save_updates_to_excel(EXCEL_FILE, updated_criteria)
 
-        # Clear plots directory to avoid residual data
         if os.path.exists(PLOTS_DIR):
             shutil.rmtree(PLOTS_DIR)
         os.makedirs(PLOTS_DIR, exist_ok=True)
 
-        # Generate plots
         plot_paths = generate_plots(PLOTS_DIR, EXCEL_FILE)
         plot_urls = [os.path.join('static', 'plots', os.path.basename(path)) for path in plot_paths]
 
@@ -90,14 +81,29 @@ def index():
 
     return render_template('index.html', criteria=criteria, scoring_criteria=scoring_criteria)
 
-def start_flask():
-    print("Starting Flask app with Waitress in production mode...")
-    serve(app, host='127.0.0.1', port=5000)
+
+class FlaskServer(threading.Thread):
+    def __init__(self):
+        super().__init__()
+        self.server = make_server('127.0.0.1', 5000, app)
+        self.context = self.server.app.app_context()
+        self.context.push()
+
+    def run(self):
+        print("Starting Flask server...")
+        self.server.serve_forever()
+
+    def stop(self):
+        print("Stopping Flask server...")
+        self.server.shutdown()
+
 
 if __name__ == '__main__':
-    flask_thread = threading.Thread(target=start_flask)
-    flask_thread.daemon = True
-    flask_thread.start()
+    flask_server = FlaskServer()
+    flask_server.start()
 
-    webview.create_window("Psychopathy Diagnosis", "http://127.0.0.1:5000", width=1500, height=800)
-    webview.start()
+    try:
+        webview.create_window("Psychopathy Diagnosis", "http://127.0.0.1:5000", width=1500, height=800)
+        webview.start()
+    finally:
+        flask_server.stop()
