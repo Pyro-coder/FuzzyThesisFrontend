@@ -50,6 +50,11 @@ th {
     gap: 5px;
 }
 
+.traits-cell {
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
 .button-container {
     display: flex;
     justify-content: center;

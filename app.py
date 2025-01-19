@@ -7,7 +7,6 @@ import webview
 import pandas as pd
 import openpyxl
 import shutil
-from waitress import serve
 from flask import Flask, render_template, request
 from psychDiagnosis.psychopathy_main import generate_plots
 
