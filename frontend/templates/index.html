@@ -6,7 +6,7 @@
         <table>
             <thead>
                 <tr>
-                    <th>Category</th>
+                    <th>Traits</th>
                     <th>Score</th>
                     <th>
                         Importance
@@ -19,7 +19,7 @@
             <tbody>
                 {% for item in criteria %}
                 <tr>
-                    <td>{{ item.name }}</td>
+                    <td class="traits-cell">{{ item.name }}</td>
                     <td>
                         <div class="radio-group">
                             {% for score in scoring_criteria[item.name] %}

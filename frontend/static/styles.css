@@ -78,6 +78,11 @@ footer {
     bottom: 0;
 }
 
+.traits-cell {
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
 @media (max-width: 600px) {
     .radio-group {
         flex-direction: row;
