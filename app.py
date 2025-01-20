@@ -1,14 +1,12 @@
-import multiprocessing
 import os
-import time
-
-import requests
 import webview
+import threading
 import pandas as pd
 import openpyxl
 import shutil
 from flask import Flask, render_template, request
 from psychDiagnosis.psychopathy_main import generate_plots
+from werkzeug.serving import make_server
 
 app = Flask(__name__, template_folder='frontend/templates', static_folder='frontend/static')
 
@@ -83,38 +81,24 @@ def index():
     return render_template('index.html', criteria=criteria, scoring_criteria=scoring_criteria)
 
 
-def run_server():
-    """Run the Flask app with Waitress."""
-    serve(app, host='127.0.0.1', port=5000)
+class FlaskServer(threading.Thread):
+    def __init__(self):
+        super().__init__()
+        self.server = make_server('127.0.0.1', 5000, app)
+        self.context = self.server.app.app_context()
+        self.context.push()
+    def run(self):
+        print("Starting Flask server...")
+        self.server.serve_forever()
 
-
-def wait_for_server(host, port, timeout=10):
-    """Wait for the server to become available."""
-    start_time = time.time()
-    while time.time() - start_time < timeout:
-        try:
-            response = requests.get(f"http://{host}:{port}")
-            if response.status_code == 200:
-                return True
-        except requests.ConnectionError:
-            time.sleep(0.1)  # Retry every 100ms
-    raise TimeoutError(f"Server did not start within {timeout} seconds.")
-
-
+    def stop(self):
+        print("Stopping Flask server...")
+        self.server.shutdown()
 if __name__ == '__main__':
-    server_process = multiprocessing.Process(target=run_server)
-    server_process.start()
-
+    flask_server = FlaskServer()
+    flask_server.start()
     try:
-        # Wait for the server to be ready
-        wait_for_server("127.0.0.1", 5000)
-
-        # Launch the webview window
         webview.create_window("Psychopathy Diagnosis", "http://127.0.0.1:5000", width=1500, height=800)
         webview.start()
-    except TimeoutError as e:
-        print(e)
     finally:
-        print("Shutting down server...")
-        server_process.terminate()
-        server_process.join()
+        flask_server.stop()
