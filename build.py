@@ -4,6 +4,7 @@ import os
 import venv
 import shutil
 
+"""Building with conda can cause errors in the final program"""
 
 def create_virtual_env(env_dir):
     """Create a virtual environment."""

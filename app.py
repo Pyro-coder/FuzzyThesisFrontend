@@ -87,6 +87,7 @@ class FlaskServer(threading.Thread):
         self.server = make_server('127.0.0.1', 5000, app)
         self.context = self.server.app.app_context()
         self.context.push()
+
     def run(self):
         print("Starting Flask server...")
         self.server.serve_forever()
@@ -94,9 +95,12 @@ class FlaskServer(threading.Thread):
     def stop(self):
         print("Stopping Flask server...")
         self.server.shutdown()
+
+
 if __name__ == '__main__':
     flask_server = FlaskServer()
     flask_server.start()
+
     try:
         webview.create_window("Psychopathy Diagnosis", "http://127.0.0.1:5000", width=1500, height=800)
         webview.start()
