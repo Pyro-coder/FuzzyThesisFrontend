@@ -78,4 +78,5 @@ jobs:
         with:
           app-name: 'psych-study-223'
           slot-name: 'Production'
+          package: release.zip
           
