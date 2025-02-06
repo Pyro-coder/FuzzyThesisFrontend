@@ -50,7 +50,8 @@
     <div class="button-container">
         <button type="submit" id="submitButton" class="g-recaptcha"
             data-sitekey="6LfzR88qAAAAAMFgZgD0Y5qpis6eFuNash-hi1C1"
-            data-callback="onSubmit">
+            data-callback="onSubmit"
+            data-badge="bottomright">
             Submit
         </button>
     </div>
@@ -59,10 +60,41 @@
 <script src="https://www.google.com/recaptcha/api.js"></script>
 <script>
     function onSubmit(token) {
-        document.getElementById("pclrForm").submit();
+        if (validateForm()) {
+            document.getElementById("pclrForm").submit();
+        } else {
+            grecaptcha.reset(); // Reset reCAPTCHA so the user can try again
+        }
     }
 
-    // Ensure dropdowns are correctly styled as disabled on page load
+    function validateForm() {
+        let valid = true;
+        let radioGroups = document.querySelectorAll('.radio-group');
+        let recaptchaResponse = document.getElementById("g-recaptcha-response").value;
+
+        // Ensure at least one radio button is selected for each trait
+        radioGroups.forEach(function (group) {
+            let radios = group.querySelectorAll('input[type="radio"]');
+            let isChecked = Array.from(radios).some(radio => radio.checked);
+            if (!isChecked) {
+                valid = false;
+            }
+        });
+
+        if (!valid) {
+            alert('Please select a value for all PCLR terms.');
+            return false;
+        }
+
+        // Ensure reCAPTCHA has been completed
+        if (!recaptchaResponse) {
+            grecaptcha.execute(); // Manually trigger reCAPTCHA
+            return false;
+        }
+
+        return true;
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         const importanceDropdowns = document.querySelectorAll('.importance-dropdown');
         importanceDropdowns.forEach(function (dropdown) {
@@ -72,7 +104,6 @@
         });
     });
 
-    // Enable or disable the "Importance" dropdowns based on the checkbox state
     document.getElementById('importanceToggle').addEventListener('change', function (event) {
         const isEnabled = event.target.checked;
         const importanceDropdowns = document.querySelectorAll('.importance-dropdown');
@@ -88,32 +119,20 @@
         });
     });
 
-    // Prevent interaction with visually disabled dropdowns
     document.addEventListener('mousedown', function (event) {
         if (event.target.matches('.importance-dropdown[data-enabled="false"]')) {
             event.preventDefault();
         }
     });
 
-    // Validate the form before submission
     document.getElementById('pclrForm').addEventListener('submit', function (event) {
-        var valid = true;
-        var radioGroups = document.querySelectorAll('.radio-group');
-
-        radioGroups.forEach(function (group) {
-            var radios = group.querySelectorAll('input[type="radio"]');
-            var isChecked = Array.from(radios).some(radio => radio.checked);
-            if (!isChecked) {
-                valid = false;
-            }
-        });
-
-        if (!valid) {
-            alert('Please select a value for all PCLR terms.');
+        if (!validateForm()) {
             event.preventDefault();
         }
     });
 </script>
+
+
 
 <style>
     /* Custom style to indicate visually disabled dropdowns */
