@@ -1,6 +1,6 @@
 import pandas as pd
 import openpyxl
-from flask import Flask, render_template, request
+from flask import Flask, abort, render_template, request
 from psychDiagnosis.psychopathy_main import generate_plots
 import time
 import shutil
@@ -82,13 +82,21 @@ def index():
     criteria, scoring_criteria = load_data_from_excel(EXCEL_FILE)
 
     if request.method == 'POST':
+        results = request.form.to_dict()
+
+        # Extract scores and importance values
+        updated_scores = {key: value for key, value in results.items() if key.endswith('_score') and value.strip()}
+        updated_importance = {key: value for key, value in results.items() if key.endswith('_importance') and value.strip()}
+
+        # If there is no valid input, reject the request
+        if not updated_scores and not updated_importance:
+            abort(400, description="Invalid submission: No meaningful data provided.")
+
+        # Create a run folder only if there is valid input
         run_folder = create_run_folder()
         copied_excel_path = copy_excel_to_run_folder(EXCEL_FILE, run_folder)
 
-        results = request.form.to_dict()
-        updated_scores = {key: value for key, value in results.items() if key.endswith('_score')}
-        updated_importance = {key: value for key, value in results.items() if key.endswith('_importance')}
-
+        # Update criteria with user-provided values
         updated_criteria = []
         for item in criteria:
             name = item['name']
@@ -97,8 +105,10 @@ def index():
             updated_item['selected_importance'] = updated_importance.get(f"{name}_importance", "N/A")
             updated_criteria.append(updated_item)
 
+        # Save updated criteria to Excel
         save_updates_to_excel(copied_excel_path, updated_criteria)
 
+        # Clear previous plots and generate new ones
         if os.path.exists(PLOTS_DIR):
             shutil.rmtree(PLOTS_DIR)
         os.makedirs(PLOTS_DIR, exist_ok=True)

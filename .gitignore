@@ -80,3 +80,7 @@ frontend/static/plots/
 
 # Plots
 Flask/static/plots
+
+# Do not take runs
+/runs/
+
