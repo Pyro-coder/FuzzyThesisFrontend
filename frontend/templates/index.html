@@ -43,12 +43,25 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Hidden input for reCAPTCHA -->
+    <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
+
     <div class="button-container">
-        <button type="submit" id="submitButton">Submit</button>
+        <button type="submit" id="submitButton" class="g-recaptcha"
+            data-sitekey="6LfzR88qAAAAAMFgZgD0Y5qpis6eFuNash-hi1C1"
+            data-callback="onSubmit">
+            Submit
+        </button>
     </div>
 </form>
 
+<script src="https://www.google.com/recaptcha/api.js"></script>
 <script>
+    function onSubmit(token) {
+        document.getElementById("pclrForm").submit();
+    }
+
     // Ensure dropdowns are correctly styled as disabled on page load
     document.addEventListener('DOMContentLoaded', function () {
         const importanceDropdowns = document.querySelectorAll('.importance-dropdown');
