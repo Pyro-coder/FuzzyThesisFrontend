@@ -19,7 +19,18 @@
             <tbody>
                 {% for item in criteria %}
                 <tr>
-                    <td class="traits-cell">{{ item.name }}</td>
+                    <!-- Update the trait cell to include the info icon and description tooltip -->
+                    <td class="traits-cell">
+                        {{ item.name }}
+                        {% if descriptions[item.name] %}
+                        <!-- Info icon: Clicking it toggles the tooltip -->
+                        <span class="info-icon" onclick="toggleDescription(this)" title="Click for more info">&#9432;</span>
+                        <!-- Hidden tooltip with the description -->
+                        <div class="description-tooltip">
+                            {{ descriptions[item.name] }}
+                        </div>
+                        {% endif %}
+                    </td>
                     <td>
                         <div class="radio-group">
                             {% for score in scoring_criteria[item.name] %}
@@ -59,6 +70,17 @@
 
 <script src="https://www.google.com/recaptcha/api.js"></script>
 <script>
+    // Function to toggle the description tooltip
+    function toggleDescription(icon) {
+        var tooltip = icon.nextElementSibling;
+        // Toggle display between 'none' and 'block'
+        if (tooltip.style.display === "block") {
+            tooltip.style.display = "none";
+        } else {
+            tooltip.style.display = "block";
+        }
+    }
+
     function onSubmit(token) {
         if (validateForm()) {
             document.getElementById("pclrForm").submit();
@@ -138,14 +160,38 @@
             }
         });
     });
-
-
-
 </script>
 
-
-
 <style>
+    /* Ensure the trait cell is relatively positioned so that the tooltip can be placed absolutely */
+    .traits-cell {
+        position: relative;
+        vertical-align: middle;
+    }
+
+    /* Styling for the clickable info icon */
+    .info-icon {
+        cursor: pointer;
+        margin-left: 5px;
+        color: #007bff; /* Adjust the color as desired */
+    }
+
+    /* Tooltip styling */
+    .description-tooltip {
+        display: none; /* Hidden by default */
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 100;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        width: 250px;
+        margin-top: 5px;
+    }
+
     /* Custom style to indicate visually disabled dropdowns */
     .disabled-dropdown {
         pointer-events: none;
