@@ -56,18 +56,21 @@ def load_data_from_excel(file_path):
     scores_data = spreadsheet.parse('Scores')
     words_data = spreadsheet.parse('Words')
 
-    criteria = scores_data.rename(columns={
+    # Build criteria without including the description column
+    criteria = scores_data[['Factors', 'Weights']].rename(columns={
         'Factors': 'name',
-        'Weights': 'default_importance',
-        'Scoring': 'description'
+        'Weights': 'default_importance'
     }).to_dict(orient='records')
+
+    # Build a dictionary mapping factor names to their descriptions (from the "Descriptions" column)
+    descriptions = scores_data.set_index('Factors')['Descriptions'].to_dict()
 
     scoring_criteria = {}
     for row in words_data.itertuples(index=False, name=None):
         if pd.notnull(row[0]):
             scoring_criteria[row[0]] = [value for value in row[1:] if pd.notnull(value)]
+    return criteria, scoring_criteria, descriptions
 
-    return criteria, scoring_criteria
 
 # Save updated data to Excel
 def save_updates_to_excel(file_path, updated_criteria):
@@ -90,7 +93,7 @@ os.makedirs(PLOTS_DIR, exist_ok=True)
 def index():
     EXCEL_FILE = os.path.join(os.path.dirname(__file__), 'psychDiagnosis', 'excel', 'PCLRWords.xlsx')
     EXCEL_FILE = os.path.abspath(EXCEL_FILE)
-    criteria, scoring_criteria = load_data_from_excel(EXCEL_FILE)
+    criteria, scoring_criteria, descriptions = load_data_from_excel(EXCEL_FILE)
 
     if request.method == 'POST':
         recaptcha_response = request.form.get('g-recaptcha-response')
@@ -139,7 +142,7 @@ def index():
 
         return render_template('results.html', results=updated_criteria, plots=plot_urls)
 
-    return render_template('index.html', criteria=criteria, scoring_criteria=scoring_criteria)
+    return render_template('index.html', criteria=criteria, scoring_criteria=scoring_criteria, descriptions=descriptions)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

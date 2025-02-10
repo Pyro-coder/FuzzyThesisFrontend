@@ -19,7 +19,20 @@
             <tbody>
                 {% for item in criteria %}
                 <tr>
-                    <td class="traits-cell">{{ item.name }}</td>
+                    <!-- Update the trait cell to include the info icon and description tooltip -->
+                    <!-- In your template: -->
+                    <td class="traits-cell">
+                        {{ item.name }}
+                        {% if descriptions[item.name] %}
+                        <!-- Info icon: Clicking it toggles the tooltip -->
+                        <span class="info-icon" onclick="toggleDescription(event, this)" title="Click for more info">&#9432;</span>
+                        <!-- Hidden tooltip with the description -->
+                        <div class="description-tooltip">
+                            {{ descriptions[item.name] }}
+                        </div>
+                        {% endif %}
+                    </td>
+
                     <td>
                         <div class="radio-group">
                             {% for score in scoring_criteria[item.name] %}
@@ -59,6 +72,45 @@
 
 <script src="https://www.google.com/recaptcha/api.js"></script>
 <script>
+    // Function to toggle the description tooltip
+    function toggleDescription(event, icon) {
+        // Prevent the click from bubbling up to any global handlers.
+        event.stopPropagation();
+
+        var tooltip = icon.nextElementSibling;
+
+        // If the tooltip is already visible, hide it.
+        if (tooltip.style.display === "block") {
+            tooltip.style.display = "none";
+            return;
+        }
+
+        // Show the tooltip so that we can measure its dimensions.
+        tooltip.style.display = "block";
+        tooltip.style.position = "absolute"; // Ensure absolute positioning
+
+        // Get the position of the icon relative to the viewport.
+        var iconRect = icon.getBoundingClientRect();
+
+        // Determine a default top position below the icon (with a 5px margin).
+        var topPosition = iconRect.bottom + 5;
+
+        // Get the tooltip's dimensions.
+        var tooltipRect = tooltip.getBoundingClientRect();
+
+        // If the tooltip's bottom edge would be off the viewport,
+        // adjust the top so the tooltip fits on the screen.
+        if (topPosition + tooltipRect.height > window.innerHeight) {
+            // Shift the tooltip upward so its bottom is 5px above the viewport bottom.
+            topPosition = window.innerHeight - tooltipRect.height - 5;
+        }
+
+        // Position the tooltip relative to the document (accounting for scrolling).
+        tooltip.style.top = (topPosition + window.scrollY) + "px";
+        tooltip.style.left = (iconRect.left + window.scrollX) + "px";
+    }
+
+
     function onSubmit(token) {
         if (validateForm()) {
             document.getElementById("pclrForm").submit();
@@ -137,15 +189,62 @@
                 event.preventDefault();
             }
         });
+
+        document.addEventListener('click', function (event) {
+            if (!event.target.closest('.info-icon') && !event.target.closest('.description-tooltip')) {
+                document.querySelectorAll('.description-tooltip').forEach(function (tooltip) {
+                    tooltip.style.display = 'none';
+                });
+            }
+        });
     });
 
 
+    // Function to toggle the description tooltip
+    function toggleDescription(event, icon) {
+        // Prevent the click from propagating to the document listener.
+        event.stopPropagation();
 
+        var tooltip = icon.nextElementSibling;
+        // Toggle display between 'none' and 'block'
+        if (tooltip.style.display === "block") {
+            tooltip.style.display = "none";
+        } else {
+            tooltip.style.display = "block";
+        }
+    }
 </script>
 
-
-
 <style>
+    /* Ensure the trait cell is relatively positioned so that the tooltip can be placed absolutely */
+    .traits-cell {
+        position: relative;
+        vertical-align: middle;
+    }
+
+    /* Styling for the clickable info icon */
+    .info-icon {
+        cursor: pointer;
+        margin-left: 5px;
+        color: #007bff; /* Adjust the color as desired */
+    }
+
+    /* Tooltip styling */
+    .description-tooltip {
+        display: none; /* Hidden by default */
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 100;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        width: 250px;
+        margin-top: 5px;
+    }
+
     /* Custom style to indicate visually disabled dropdowns */
     .disabled-dropdown {
         pointer-events: none;
