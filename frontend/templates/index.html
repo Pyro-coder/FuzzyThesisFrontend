@@ -34,14 +34,14 @@
                     </td>
 
                     <td>
-                        <select name="{{ item.name }}_score" class="pclr-term score-dropdown">
-                            <option value="" selected></option>
+                        <div class="radio-group">
                             {% for score in scoring_criteria[item.name] %}
-                                <option value="{{ score }}">{{ score }}</option>
+                            <label>
+                                <input type="radio" name="{{ item.name }}_score" value="{{ score }}" class="pclr-term"> {{ score }}
+                            </label>
                             {% endfor %}
-                        </select>
+                        </div>
                     </td>
-                    
                     <td>
                         <select name="{{ item.name }}_importance" class="importance-dropdown" data-enabled="false">
                             <option value="Low" {% if item.default_importance == "Low" %}selected{% endif %}>Low</option>
@@ -121,10 +121,14 @@
 
     function validateForm() {
         let valid = true;
-        // Check that a score has been selected for each trait
-        let scoreSelects = document.querySelectorAll('select[name$="_score"]');
-        scoreSelects.forEach(function (select) {
-            if (!select.value) {
+        let radioGroups = document.querySelectorAll('.radio-group');
+        let recaptchaResponse = document.getElementById("g-recaptcha-response").value;
+
+        // Ensure at least one radio button is selected for each trait
+        radioGroups.forEach(function (group) {
+            let radios = group.querySelectorAll('input[type="radio"]');
+            let isChecked = Array.from(radios).some(radio => radio.checked);
+            if (!isChecked) {
                 valid = false;
             }
         });
@@ -134,8 +138,7 @@
             return false;
         }
 
-        // Ensure reCAPTCHA has been completed (if still needed)
-        let recaptchaResponse = document.getElementById("g-recaptcha-response").value;
+        // Ensure reCAPTCHA has been completed
         if (!recaptchaResponse) {
             grecaptcha.reset(); // Reset in case of an issue
             grecaptcha.execute(); // Manually trigger reCAPTCHA
@@ -144,7 +147,6 @@
 
         return true;
     }
-
 
     document.addEventListener('DOMContentLoaded', function () {
         const importanceDropdowns = document.querySelectorAll('.importance-dropdown');
@@ -254,10 +256,5 @@
     #importanceToggle {
         margin-left: 10px;
     }
-
-    .score-dropdown {
-        width: 200px;
-    }
-
 </style>
 {% endblock %}
