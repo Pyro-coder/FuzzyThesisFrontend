@@ -20,26 +20,28 @@
                 {% for item in criteria %}
                 <tr>
                     <!-- Update the trait cell to include the info icon and description tooltip -->
+                    <!-- In your template: -->
                     <td class="traits-cell">
                         {{ item.name }}
                         {% if descriptions[item.name] %}
                         <!-- Info icon: Clicking it toggles the tooltip -->
-                        <span class="info-icon" onclick="toggleDescription(this)" title="Click for more info">&#9432;</span>
+                        <span class="info-icon" onclick="toggleDescription(event, this)" title="Click for more info">&#9432;</span>
                         <!-- Hidden tooltip with the description -->
                         <div class="description-tooltip">
                             {{ descriptions[item.name] }}
                         </div>
                         {% endif %}
                     </td>
+
                     <td>
-                        <div class="radio-group">
+                        <select name="{{ item.name }}_score" class="pclr-term score-dropdown">
+                            <option value="" selected></option>
                             {% for score in scoring_criteria[item.name] %}
-                            <label>
-                                <input type="radio" name="{{ item.name }}_score" value="{{ score }}" class="pclr-term"> {{ score }}
-                            </label>
+                                <option value="{{ score }}">{{ score }}</option>
                             {% endfor %}
-                        </div>
+                        </select>
                     </td>
+                    
                     <td>
                         <select name="{{ item.name }}_importance" class="importance-dropdown" data-enabled="false">
                             <option value="Low" {% if item.default_importance == "Low" %}selected{% endif %}>Low</option>
@@ -71,15 +73,43 @@
 <script src="https://www.google.com/recaptcha/api.js"></script>
 <script>
     // Function to toggle the description tooltip
-    function toggleDescription(icon) {
+    function toggleDescription(event, icon) {
+        // Prevent the click from bubbling up to any global handlers.
+        event.stopPropagation();
+
         var tooltip = icon.nextElementSibling;
-        // Toggle display between 'none' and 'block'
+
+        // If the tooltip is already visible, hide it.
         if (tooltip.style.display === "block") {
             tooltip.style.display = "none";
-        } else {
-            tooltip.style.display = "block";
+            return;
         }
+
+        // Show the tooltip so that we can measure its dimensions.
+        tooltip.style.display = "block";
+        tooltip.style.position = "absolute"; // Ensure absolute positioning
+
+        // Get the position of the icon relative to the viewport.
+        var iconRect = icon.getBoundingClientRect();
+
+        // Determine a default top position below the icon (with a 5px margin).
+        var topPosition = iconRect.bottom + 5;
+
+        // Get the tooltip's dimensions.
+        var tooltipRect = tooltip.getBoundingClientRect();
+
+        // If the tooltip's bottom edge would be off the viewport,
+        // adjust the top so the tooltip fits on the screen.
+        if (topPosition + tooltipRect.height > window.innerHeight) {
+            // Shift the tooltip upward so its bottom is 5px above the viewport bottom.
+            topPosition = window.innerHeight - tooltipRect.height - 5;
+        }
+
+        // Position the tooltip relative to the document (accounting for scrolling).
+        tooltip.style.top = (topPosition + window.scrollY) + "px";
+        tooltip.style.left = (iconRect.left + window.scrollX) + "px";
     }
+
 
     function onSubmit(token) {
         if (validateForm()) {
@@ -91,14 +121,10 @@
 
     function validateForm() {
         let valid = true;
-        let radioGroups = document.querySelectorAll('.radio-group');
-        let recaptchaResponse = document.getElementById("g-recaptcha-response").value;
-
-        // Ensure at least one radio button is selected for each trait
-        radioGroups.forEach(function (group) {
-            let radios = group.querySelectorAll('input[type="radio"]');
-            let isChecked = Array.from(radios).some(radio => radio.checked);
-            if (!isChecked) {
+        // Check that a score has been selected for each trait
+        let scoreSelects = document.querySelectorAll('select[name$="_score"]');
+        scoreSelects.forEach(function (select) {
+            if (!select.value) {
                 valid = false;
             }
         });
@@ -108,7 +134,8 @@
             return false;
         }
 
-        // Ensure reCAPTCHA has been completed
+        // Ensure reCAPTCHA has been completed (if still needed)
+        let recaptchaResponse = document.getElementById("g-recaptcha-response").value;
         if (!recaptchaResponse) {
             grecaptcha.reset(); // Reset in case of an issue
             grecaptcha.execute(); // Manually trigger reCAPTCHA
@@ -117,6 +144,7 @@
 
         return true;
     }
+
 
     document.addEventListener('DOMContentLoaded', function () {
         const importanceDropdowns = document.querySelectorAll('.importance-dropdown');
@@ -159,7 +187,30 @@
                 event.preventDefault();
             }
         });
+
+        document.addEventListener('click', function (event) {
+            if (!event.target.closest('.info-icon') && !event.target.closest('.description-tooltip')) {
+                document.querySelectorAll('.description-tooltip').forEach(function (tooltip) {
+                    tooltip.style.display = 'none';
+                });
+            }
+        });
     });
+
+
+    // Function to toggle the description tooltip
+    function toggleDescription(event, icon) {
+        // Prevent the click from propagating to the document listener.
+        event.stopPropagation();
+
+        var tooltip = icon.nextElementSibling;
+        // Toggle display between 'none' and 'block'
+        if (tooltip.style.display === "block") {
+            tooltip.style.display = "none";
+        } else {
+            tooltip.style.display = "block";
+        }
+    }
 </script>
 
 <style>
@@ -203,5 +254,10 @@
     #importanceToggle {
         margin-left: 10px;
     }
+
+    .score-dropdown {
+        width: 200px;
+    }
+
 </style>
 {% endblock %}
