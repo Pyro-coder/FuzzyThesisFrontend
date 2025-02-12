@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Get the reCAPTCHA secret key from the environment (or use a test key)
-RECAPTCHA_SECRET_KEY = "test"  # or use os.getenv("RECAPTCHA_SECRET_KEY")
+RECAPTCHA_SECRET_KEY = os.getenv("RECAPTCHA_SECRET_KEY")
 
 if not RECAPTCHA_SECRET_KEY:
     raise ValueError("Missing reCAPTCHA secret key! Set the RECAPTCHA_SECRET_KEY environment variable.")
