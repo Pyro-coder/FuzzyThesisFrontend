@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<style>
+    h1{
+        text-align: center;
+    }
+    p{
+        text-align: center;
+    }
+    button{
+        align-items: center;
+    }
+    .center_button{
+        margin: 0;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -ms-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+    }
+</style>
+
+<body>
+    <div class="container">
+        <h1>Psychopathy Research Survey</h1>
+        <p>
+            For this quick research study, please think about the most antisocial (maybe psychotic) individual you have met.<br>
+            You will be asked twenty questions about them. Do your best to answer the questions honestly. Afterwards, you will <br>
+            see the results of your answers, but you can disregaurd that. Thanks again for helping with my research study!<br><br>
+            
+            - Noah Oppermann
+        </p>
+        <div class="center_button">
+            <a href="{{ url_for('diagnosis') }}">
+                <button>Start</button>
+            </a>   
+        </div>  
+    </div>
+</body>
+</html>
+

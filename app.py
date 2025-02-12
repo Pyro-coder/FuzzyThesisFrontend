@@ -5,15 +5,15 @@ import sys
 import requests
 import pandas as pd
 import openpyxl
-from flask import Flask, abort, render_template, request
+from flask import Flask, abort, render_template, request, redirect, url_for
 from psychDiagnosis.psychopathy_main import generate_plots
 from dotenv import load_dotenv
 
 # Load environment variables from .env if present
 load_dotenv()
 
-# Get the reCAPTCHA secret key from the environment
-RECAPTCHA_SECRET_KEY = os.getenv("RECAPTCHA_SECRET_KEY")
+# Get the reCAPTCHA secret key from the environment (or use a test key)
+RECAPTCHA_SECRET_KEY = "test"  # or use os.getenv("RECAPTCHA_SECRET_KEY")
 
 if not RECAPTCHA_SECRET_KEY:
     raise ValueError("Missing reCAPTCHA secret key! Set the RECAPTCHA_SECRET_KEY environment variable.")
@@ -71,7 +71,6 @@ def load_data_from_excel(file_path):
             scoring_criteria[row[0]] = [value for value in row[1:] if pd.notnull(value)]
     return criteria, scoring_criteria, descriptions
 
-
 # Save updated data to Excel
 def save_updates_to_excel(file_path, updated_criteria):
     workbook = openpyxl.load_workbook(file_path)
@@ -89,8 +88,21 @@ def save_updates_to_excel(file_path, updated_criteria):
 PLOTS_DIR = os.path.join(app.root_path, 'frontend', 'static', 'plots')
 os.makedirs(PLOTS_DIR, exist_ok=True)
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
+# --- Routing Setup ---
+
+# Redirect the root URL to the welcome screen
+@app.route('/')
+def home():
+    return redirect(url_for('welcome'))
+
+# The welcome screen route
+@app.route('/welcome')
+def welcome():
+    return render_template('welcome.html')
+
+# Main application route (the diagnosis form)
+@app.route('/diagnosis', methods=['GET', 'POST'])
+def diagnosis():
     EXCEL_FILE = os.path.join(os.path.dirname(__file__), 'psychDiagnosis', 'excel', 'PCLRWords.xlsx')
     EXCEL_FILE = os.path.abspath(EXCEL_FILE)
     criteria, scoring_criteria, descriptions = load_data_from_excel(EXCEL_FILE)
