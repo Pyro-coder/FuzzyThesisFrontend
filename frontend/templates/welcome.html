@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<style>
+    h1{
+        text-align: center;
+    }
+    p{
+        text-align: center;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    button{
+        align-items: center;
+    }
+    .center_button{
+        text-align: center;
+        margin-top: 20px; /* Adjust the margin as needed */
+    }
+</style>
+
+<body>
+    <div class="container">
+        <h1>Psychopathy Research Survey</h1>
+        <p>
+            Thank you for assisting with the research study I am completing for my capstone project! This study is focused on 
+            developing a new scoring system for a type of personality assessment. This is an important project for me that I 
+            have devoted a lot of time and effort to, and I am very appreciative of your help.<br><br>
+
+            To begin, please think about the person you would consider to be the biggest troublemaker you know personally - someone 
+            who has a history of breaking rules or even laws. For this study, you will be presented with a series of 20 personality 
+            characteristics or behaviors. You are being asked to rate the "trobulemaker" whom you thought of on each of those dimensions. 
+            You will never be asked to reveal the person's identity, so you can rate that individual honestly and accurately. I will 
+            never know who is being described.<br><br>
+
+            Once you complete the ratings, you are finished. You will be presented with some statistics and graphs, but that information 
+            likely will not mean much to you. That is ok. I do not expect you to utilize or understand the output. That information will be 
+            helpful to me as I develop and evaluate the effectiveness of this new scoring system for personality assessment.<br><br>
+
+            If you have additional questions about the study, please feel free to reach out to me. I would be happy to answer any 
+            questions you might have.<br><br>
+
+            Please click the button below to continue. Clicking the button indicates that you are 
+            voluntarily consenting to participate in my study.<br><br>
+
+            Once again, thanks so much for helping with my research study! 
+        </p>
+        <div class="center_button">
+            <a href="{{ url_for('diagnosis') }}">
+                <button>Start</button>
+            </a>   
+        </div>  
+    </div>
+</body>
+</html>
+

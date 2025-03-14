@@ -919,3 +919,55 @@ def generate_plots(output_dir, file_path):
     plot3 = calculate_and_save_psychopathy(psych_score_noncriminal, "Non-Criminal Psychopathy", output_dir)
 
     return [plot1, plot2, plot3]
+
+
+def calculate_psychopathy_centroids(excel_file_path):
+    """
+    Load the Excel file (using the same format as in the current code) and calculate
+    the defuzzified centroids for Criminal Psychopathy, Professionally Beneficial Psychopathy,
+    and Non-Criminal Psychopathy.
+
+    Parameters:
+        excel_file_path (str): Path to the Excel file (e.g., "excel/PCLRWords.xlsx")
+
+    Returns:
+        dict: A dictionary with keys "Criminal Psychopathy", "Professionally Beneficial Psychopathy",
+              and "Non-Criminal Psychopathy" mapping to their corresponding defuzzified centroids.
+    """
+    # Load the filtered data and set the global variables needed by the psychopathy functions
+    data = get_filtered_data(excel_file_path)
+    global interpersonal_data, affective_data, lifestyle_data, antisocial_data
+    global interpersonal_weight_data, affective_weight_data, lifestyle_weight_data, antisocial_weight_data
+
+    interpersonal_data = data["interpersonal_data"]
+    affective_data = data["affective_data"]
+    lifestyle_data = data["lifestyle_data"]
+    antisocial_data = data["antisocial_data"]
+
+    interpersonal_weight_data = data["interpersonal_weight_data"]
+    affective_weight_data = data["affective_weight_data"]
+    lifestyle_weight_data = data["lifestyle_weight_data"]
+    antisocial_weight_data = data["antisocial_weight_data"]
+
+    # Compute the psychopathy scores for each type.
+    # (Using exponent values consistent with the existing implementation.)
+    psych_criminal = criminal_psychopathy(1)
+    psych_prof = professionally_beneficial_psychopathy(1)
+    psych_noncriminal = noncriminal_psychopathy(2)
+
+    # For each psychopathy score, calculate the type-2 centroid and then defuzzify.
+    centroid_criminal = t2_centroid(psych_criminal[0], psych_criminal[1], 300)
+    dcs_criminal = defuzz(centroid_criminal)
+
+    centroid_prof = t2_centroid(psych_prof[0], psych_prof[1], 300)
+    dcs_prof = defuzz(centroid_prof)
+
+    centroid_noncriminal = t2_centroid(psych_noncriminal[0], psych_noncriminal[1], 300)
+    dcs_noncriminal = defuzz(centroid_noncriminal)
+
+    # Return the defuzzified centroids in a dictionary.
+    return {
+        "Criminal Psychopathy": dcs_criminal,
+        "Professionally Beneficial Psychopathy": dcs_prof,
+        "Non-Criminal Psychopathy": dcs_noncriminal
+    }
